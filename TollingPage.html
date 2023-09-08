@@ -1,0 +1,138 @@
+<html>
+<head>
+    <title>Toll Plaza Software</title>
+    <link rel="stylesheet" href="..\css\mainstyle.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      
+        var prices = {
+            "Bikes": 10,
+            "LMV": 20,
+            "HMV": 30,
+            "Heavy Trucks": 40
+        };
+
+       
+        var entries = [];
+
+      
+        function addEntry() {
+            var vehicle = $("#vehicle").val();
+            var category = $("#category").val();
+
+            if (vehicle == "" || category == "") {
+                alert("Please enter the vehicle number and category");
+                return;
+            }
+            if (!prices.hasOwnProperty(category)) {
+                alert("Invalid category");
+                return;
+            }
+
+            var amount = prices[category];
+
+            var entry = {
+                "vehicle": vehicle,
+                "category": category,
+                "amount": amount
+            };
+
+            entries.push(entry);
+
+            $("#vehicle").val("");
+            $("#category").val("");
+
+            alert("Entry added successfully. The toll amount is " + amount);
+
+            showStatistics();
+            showSearchResults();
+        }
+
+        function showStatistics() {
+            var stats = {};
+
+            for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i];
+                var category = entry.category;
+                var amount = entry.amount;
+
+                if (!stats.hasOwnProperty(category)) {
+                    stats[category] = {
+                        "total": 0,
+                        "count": 0
+                    };
+                }
+
+                stats[category].total += amount;
+                stats[category].count++;
+            }
+
+            var html = "<table><tr><th>Category</th><th>Total Amount</th><th>Count</th></tr>";
+
+        
+            for (var category in stats) {
+                var total = stats[category].total;
+                var count = stats[category].count;
+
+                html += "<tr><td>" + category + "</td><td>" + total + "</td><td>" + count + "</td></tr>";
+            }
+
+            html += "</table>";
+             $("#statistics").html(html);
+        }
+
+   
+        function showSearchResults() {
+           var filterCategory = $("#filterCategory").val();
+            var filterVehicle = $("#filterVehicle").val();
+
+            var html = "<table><tr><th>Vehicle</th><th>Category</th><th>Amount</th></tr>";
+
+            for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i];
+                var vehicle = entry.vehicle;
+                var category = entry.category;
+                var amount = entry.amount;
+
+                if ((filterCategory == "" || filterCategory == category) && (filterVehicle == "" || filterVehicle == vehicle)) {
+                    html += "<tr><td>" + vehicle + "</td><td>" + category + "</td><td>" + amount + "</td></tr>";
+                }
+                
+            }
+            html += "</table>";
+           $("#searchResults").html(html);
+        }
+    </script>
+</head>
+<body>
+    <div>
+    <h1 style="text-align: center">Toll Plaza Software</h1>
+    <h2>Add Entry</h2>
+    <p>Enter the vehicle number and category and click on the Add button to generate the toll amount.</p>
+    <p>Vehicle: <input type="text" id="vehicle"></p>
+    <p>Category: <select id="category">
+        <option value="">Select</option>
+        <option value="Bikes">Bikes</option>
+        <option value="LMV">LMV</option>
+        <option value="HMV">HMV</option>
+        <option value="Heavy Trucks">Heavy Trucks</option>
+    </select></p>
+    <p><button onclick="addEntry()">Add</button></p>
+</div>
+    <h2>Statistics</h2>
+    <p>View the total amount and count of entries for each category.</p>
+    <div id="statistics"></div>
+    <h2>Search</h2>
+    <p>Filter the entries based on category and vehicle number.</p>
+    <p>Category: <select id="filterCategory" onchange="showSearchResults()">
+        <option value="">All</option>
+        <option value="Bikes">Bikes</option>
+        <option value="LMV">LMV</option>
+        <option value="HMV">HMV</option>
+        <option value="Heavy Trucks">Heavy Trucks</option>
+    </select></p>
+    <p>Vehicle: <input type="text" id="filterVehicle" onkeyup="showSearchResults()"></p>
+    <div id="searchResults"></div>
+</body>
+</html>
+
